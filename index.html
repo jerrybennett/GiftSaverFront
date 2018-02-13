@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.14/semantic.min.css" />
+  <!-- <link rel="stylesheet" href="css/semantic.min.css"> -->
+  <link rel="stylesheet" href="css/style.css">
+  <title>GiftSaver</title>
+</head>
+<body>
+  <div class="ui container">
+  <header class="ui container">
+    <h1>GiftSaver</h1>
+    <div class="meta">Some tagline</div>
+    <div class="ui divider hidden">
+      <div id="addNewPersonButton" onclick="hideShow()" class="ui button">
+        <i class="add icon"></i>
+        Add Person
+      </div>
+    </div>
+  </header>
+
+    <div class="ui divider"></div>
+
+    <div id="newPersonForm"></div>
+  <div id="main" class="ui container">
+
+
+
+    <div id="personForm">
+      <label>Image</label>
+        <input id="personImgInput" type="text"><br>
+      <label>Name</label>
+        <input id="personNameInput" type="text"><br>
+      <label>Birthday</label>
+        <input id="personBDayInput" type="text"><br>
+      <input type="submit" value="Submit">
+    </div>
+
+
+    <div id="people" class="ui five doubling cards people"></div>
+    <div id="gifts" class="ui cards gifts"></div>
+
+  </div>
+
+  </div>
+
+
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <!-- <script src="js/semantic.min.js" charset="utf-8"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.14/semantic.min.js"></script>
+
+  <script src="js/gift.js" charset="utf-8"></script>
+  <script src="js/person.js" charset="utf-8"></script>
+  <script src="js/index.js" charset="utf-8"></script>
+</body>
+</html>
