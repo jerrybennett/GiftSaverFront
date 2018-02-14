@@ -1,0 +1,16 @@
+body {
+  margin: 40px 20px;
+}
+header {
+  margin-bottom: 20px;
+}
+#people {
+  margin-top: 40px;
+}
+#newPersonForm {
+  margin-top: 40px;
+}
+
+.container {
+  margin-top: 40px;
+}

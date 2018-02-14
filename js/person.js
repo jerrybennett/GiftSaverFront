@@ -4,10 +4,15 @@ class Person {
     this.name = name,
     this.img = img,
     this.birth_day = birth_day
+    this.gifts = []
+  }
+
+  addGift(gift) {
+    this.gifts.push(gift)
   }
 
   render(){
-    return `<div class="card">
+    return `<div data-set="${this.id}" class="card">
       <div class="image">
         <img src="${this.img}">
       </div>
@@ -17,9 +22,19 @@ class Person {
           <a>${this.birth_day}</a>
         </div>
       </div>
-      <div class="ui bottom attached button">
-        <i class="add icon"></i>
-        Add Gift
+    </div>`
+  }
+
+  renderSingle(){
+    return `<div data-id="${this.id}" class="card">
+      <div class="image">
+        <img src="${this.img}">
+      </div>
+      <div class="content">
+        <div class="header">${this.name}</div>
+        <div class="meta">
+          <a>${this.birth_day}</a>
+        </div>
       </div>
     </div>`
   }

@@ -1,9 +1,22 @@
 document.addEventListener("DOMContentLoaded", function(event) {
     console.log("DOM fully loaded and parsed");
 
+    function myFunction() {
+      var x = document.getElementById("newPersonForm");
+      if (x.style.display === "none") {
+          x.style.display = "block";
+      } else {
+          x.style.display = "none";
+      }
+    }
+
     const basePeopleURL = `http://localhost:3000/api/v1/people`
     const baseGiftURL = `http://localhost:3000/api/v1/gifts`
     const peopleDiv = document.getElementById('people')
+    const giftsDiv = document.getElementById('gifts')
+    const mainDiv = document.getElementById('show-all')
+    const profileDiv = document.getElementById('profile')
+    const giftForm = document.getElementById('giftForm')
 
     function getPeople() {
       fetch(basePeopleURL)
@@ -11,6 +24,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
         .then(peopleArr => {
           peopleArr.forEach(function(person){
             let p = new Person(person)
+            person.gifts.forEach(function(gift) {
+              let g = new Gift(gift)
+              p.addGift(g)
+            })
             peopleDiv.innerHTML += p.render()
           })
         })
@@ -28,19 +45,42 @@ document.addEventListener("DOMContentLoaded", function(event) {
           img: img,
           birth_day: birth_day
         })
-      }).then(res => res.json()).then(json => {
+      })
+      .then(res => res.json())
+      .then(json => {
         let newPerson = new Person(json)
-        peopleDiv.innerHTML += newPerson.render()
-      }).then(console.log)
+        profileDiv.innerHTML += newPerson.renderSingle()
+        appendGiftForm()
+      })
     }
 
     function getPerson(id) {
       fetch(basePeopleURL + `/${id}`)
         .then(res => res.json())
-        .then(console.log)
     }
 
-    // getPerson("8")
+    function editPerson(id, name, img, birth_day) {
+      fetch(basePeopleURL + `/${id}`, {
+        method: "PATCH",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: "Jimbo",
+          img: "string",
+          birth_day: birth_day
+        })
+      }).then(res => res.json())
+        .then(json => {
+          let newPerson = new Person(json)
+        })
+    }
+
+    function deletePerson(id) {
+      fetch(basePeopleURL + `/${id}`, {
+        method: "DELETE"
+      }).then(res => res.json())
+    }
 
     function getAllGifts() {
       fetch(baseGiftURL)
@@ -55,96 +95,158 @@ document.addEventListener("DOMContentLoaded", function(event) {
         .then(json => console.log(json))
     }
 
+    mainDiv.addEventListener('submit', function(e) {
+      e.preventDefault()
+        let card = document.getElementsByClassName('card')[0].dataset.id
+        const giftImgInput = document.getElementById('giftImgInput').value
+        const giftNameInput = document.getElementById('giftNameInput').value
+        const giftDescriptionInput = document.getElementById('giftDescriptionInput').value
+        newGiftObj = {name: `${giftNameInput}`, gift_img: `${giftImgInput}`, description: `${giftDescriptionInput}`, person_id: `${card}`}
+        createGift(newGiftObj)
+    })
+
     function createGift(obj){
       fetch(baseGiftURL, {
         method: 'POST',
         headers:  {
           'Content-Type':'application/json'
         },
-        body: JSON.stringify({
-          name: obj.name,
-          gift_img: obj.gift_img,
-          description: obj.description,
-          person_id: obj.person_id
-        })
-      }).then(res => { return res.json()}).then(json => console.log(json))
+        body: JSON.stringify(obj)
+      })
+      .then(res => res.json())
+      .then(json => {
+        // let newGift = new Gift(json)
+        // giftsDiv.innerHTML += newGift.renderSingleGift()
+        console.log(json);
+        // create and new gift card and append to "gifts "dom element
+      })
     }
 
-    const personForm = document.getElementById('personForm')
-    const personImgInput = document.getElementById('personImgInput')
-    const personNameInput = document.getElementById('personNameInput')
-    const personBDayInput = document.getElementById('personBDayInput')
-
-    function handleNewPerson(e){
-      e.preventDefault()
-      let name = personNameInput.value
-      let img = personImgInput.value
-      let birth_day = personBDayInput.value
-      createPerson(name, img, birth_day)
-    }
-
+    // console.log(giftsDiv.children.includes("button"))
 
     const addNewPersonButton = document.getElementById('addNewPersonButton')
     console.log(addNewPersonButton);
-    const newPersonForm = document.getElementById('newPersonForm')
-    newPersonForm.addEventListener('submit', handleNewPerson)
 
 
-    // addNewPersonButton.addEventListener('click', function(e){
-    //   main.innerHTML = ''
-    //   const personForm = document.createElement('form')
-    //   personForm.setAttribute('id', 'personForm')
-    //   const imageLabel = document.createElement('label')
-    //   imageLabel.innerText = 'Image'
-    //   const imgInput = document.createElement('input')
-    //   imgInput.setAttribute('type', 'text')
-    //   imgInput.setAttribute('id', 'personImgInput')
-    //   const nameLabel = document.createElement('label')
-    //   nameLabel.innerText = 'Name'
-    //   const nameInput = document.createElement('input')
-    //   nameInput.setAttribute('type', 'text')
-    //   nameInput.setAttribute('id', 'personNameInput')
-    //   const birthdayLabel = document.createElement('label')
-    //   birthdayLabel.innerText = 'Birthday'
-    //   const birthdayInput = document.createElement('input')
-    //   birthdayInput.setAttribute('type', 'text')
-    //   birthdayInput.setAttribute('id', 'personBDayInput')
-    //   const submitInput = document.createElement('input')
-    //   submitInput.setAttribute('type', 'submit')
-    //   submitInput.setAttribute('value', 'Submit')
-    //   personForm.append(imageLabel)
-    //   personForm.append(imgInput)
-    //   personForm.append(nameLabel)
-    //   personForm.append(nameInput)
-    //   personForm.append(birthdayLabel)
-    //   personForm.append(birthdayInput)
-    //   personForm.append(submitInput)
-    //   newPersonForm.append(personForm)
-    //   // console.log(newPersonForm);
+    const forms = document.getElementById('forms')
+
+    function personFormAppend(){
+      return `<div id="newPersonForm" class="ui container">
+        <div class="ui two column doubling stackable grid container">
+          <img class="ui medium rounded image" src="http://via.placeholder.com/200x200">
+          <form class="ui form">
+            <h3 class="ui header">New Person</h3>
+            <div class="field">
+              <label>Image URL</label>
+              <input id="personImgInput" type="text" name="img" placeholder="Image URL">
+            </div>
+            <div class="field">
+              <label>Name</label>
+              <input id="personNameInput" type="text" name="name" placeholder="Name">
+            </div>
+            <div class="field">
+              <label>Birthday</label>
+              <input id="personBDayInput" type="text" name="birth_day" placeholder="Birthday">
+            </div>
+            <button class="ui button" type="submit">Save</button>
+          </form>
+        </div>
+      </div>`
+    }
+
+    addNewPersonButton.addEventListener('click', function(e){
+      peopleDiv.innerHTML = ""
+      forms.innerHTML += personFormAppend()
+    })
+
+    function appendGiftForm() {
+      const gF = `<div id="newGiftForm" class="ui container">
+        <div class="ui two column doubling stackable grid container">
+          <img class="ui medium rounded image" src="http://via.placeholder.com/200x200">
+          <form class="ui form">
+            <h3 class="ui header">New Gift</h3>
+            <div class="field">
+              <label>Gift Image URL</label>
+              <input id="giftImgInput" type="text" name="img" placeholder="Gift Image URL">
+            </div>
+            <div class="field">
+              <label>Name</label>
+              <input id="giftNameInput" type="text" name="name" placeholder="Name">
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <input id="giftDescriptionInput" type="text" name="birth_day" placeholder="Description">
+            </div>
+            <button class="ui button" type="submit">Save</button>
+          </form>
+        </div>
+      </div>`
+      giftForm.innerHTML += gF
+    }
+
+
+    // giftsDiv.addEventListener('click', )
+
+    function appendEditGiftForm(){
+      return `<div id="editGiftForm" class="ui container">
+        <div class="ui two column doubling stackable grid container">
+          <img class="ui medium rounded image" src="http://via.placeholder.com/200x200">
+          <form class="ui form">
+            <h3 class="ui header">Edit Gift</h3>
+            <div class="field">
+              <label>Gift Image URL</label>
+              <input id="giftImgInput" type="text" name="img" placeholder="Gift Image URL">
+            </div>
+            <div class="field">
+              <label>Name</label>
+              <input id="giftNameInput" type="text" name="name" placeholder="Name">
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <input id="giftDescriptionInput" type="text" name="birth_day" placeholder="Description">
+            </div>
+            <button class="ui button" type="submit">Save</button>
+            <button class="ui button" type="submit">Delete</button>
+          </form>
+        </div>
+      </div>`
+    }
+
+
+    // addNewPersonButton.addEventListener('click', function(e) {
+    //   var x = addNewPersonButton
+    //     if (x.style.visibility === "hidden") {
+    //         x.style.visibility = "visible";
+    //     } else {
+    //         x.style.visibility = "hidden";
+    //     }
     // })
 
+    people.addEventListener('click', function(e){
+      if(e.target.id){
+        people.innerHTML = ""
 
-    function addPerson(){
+        //display person and all of their gifts
 
+      }
+    })
+
+    const newPersonForm = document.getElementById('newPersonForm')
+    forms.addEventListener('submit', handleNewPerson)
+
+    const pForm = document.getElementById('personForm')
+
+    function handleNewPerson(e){
+      e.preventDefault()
+      const imgInput = document.getElementById('personImgInput')
+      const nameInput = document.getElementById('personNameInput')
+      const bDayInput = document.getElementById('personBDayInput')
+      let name = nameInput.value
+      let img = imgInput.value
+      let birth_day = bDayInput.value
+      let newPerson = createPerson(name, img, birth_day)
+      forms.innerHTML = ""
+      // getPeople()
     }
-    // click on a person and show them and their gifts
-    function showPerson(){
-      getPerson(id)
-    }
-    peopleDiv.addEventListener('click', showPerson)
-
-    //
-    // function hideShow() {
-    //   var x = document.getElementById("personForm");
-    //     if (x.style.display === "none") {
-    //         x.style.display = "block";
-    //     } else {
-    //         x.style.display = "none";
-    //     }
-    // }
-
-    // crate gift for person
-
-
 
   });
