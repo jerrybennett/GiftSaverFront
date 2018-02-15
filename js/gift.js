@@ -1,3 +1,4 @@
+let giftStore = []
 class Gift {
   constructor({id, name, gift_img, description, person_id}) {
     this.id = id,
@@ -5,6 +6,7 @@ class Gift {
     this.gift_img = gift_img,
     this.description = description,
     this.person_id = person_id
+    giftStore.push(this)
   }
 
   renderSingleGift(){
@@ -40,8 +42,8 @@ class Gift {
             <input id="giftDescriptionInput" type="text" name="birth_day" placeholder="Description">
           </div>
           <button class="ui button" type="submit">Save</button>
-          <button class="ui button" type="submit">Delete</button>
         </form>
+        <button class="ui button" type="submit">Delete</button>
       </div>
     </div>`
   }

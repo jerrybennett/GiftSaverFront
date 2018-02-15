@@ -17,7 +17,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const mainDiv = document.getElementById('show-all')
     const profileDiv = document.getElementById('profile')
     const giftForm = document.getElementById('giftForm')
+    const personForm = document.getElementById('personForm')
+    const newPersonForm = document.getElementById('newPersonForm')
+    const addNewPersonButton = document.getElementById('addNewPersonButton')
+    const forms = document.getElementById('forms')
 
+
+    // All People Routes
     function getPeople() {
       fetch(basePeopleURL)
         .then(res => res.json())
@@ -50,6 +56,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       .then(json => {
         let newPerson = new Person(json)
         profileDiv.innerHTML += newPerson.renderSingle()
+        personForm.innerHTML = ''
         appendGiftForm()
       })
     }
@@ -66,8 +73,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: "Jimbo",
-          img: "string",
+          name: name,
+          img: img,
           birth_day: birth_day
         })
       }).then(res => res.json())
@@ -82,28 +89,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
       }).then(res => res.json())
     }
 
+    // All Gift Routes
     function getAllGifts() {
       fetch(baseGiftURL)
         .then(res => res.json())
-        .then(json => console.log(json))
     }
     getAllGifts()
 
-    function getGift() {
+    function getGift(id) {
       fetch(baseGiftURL + `/${id}`)
         .then(res => res.json())
-        .then(json => console.log(json))
     }
-
-    mainDiv.addEventListener('submit', function(e) {
-      e.preventDefault()
-        let card = document.getElementsByClassName('card')[0].dataset.id
-        const giftImgInput = document.getElementById('giftImgInput').value
-        const giftNameInput = document.getElementById('giftNameInput').value
-        const giftDescriptionInput = document.getElementById('giftDescriptionInput').value
-        newGiftObj = {name: `${giftNameInput}`, gift_img: `${giftImgInput}`, description: `${giftDescriptionInput}`, person_id: `${card}`}
-        createGift(newGiftObj)
-    })
 
     function createGift(obj){
       fetch(baseGiftURL, {
@@ -115,20 +111,38 @@ document.addEventListener("DOMContentLoaded", function(event) {
       })
       .then(res => res.json())
       .then(json => {
-        // let newGift = new Gift(json)
-        // giftsDiv.innerHTML += newGift.renderSingleGift()
-        console.log(json);
-        // create and new gift card and append to "gifts "dom element
+        let newGift = new Gift(json)
+        giftForm.innerHTML = ''
+        giftsDiv.innerHTML += newGift.renderSingleGift()
       })
     }
 
-    // console.log(giftsDiv.children.includes("button"))
+    function editGift(obj) {
+      fetch(baseGiftURL + `/${obj.id}`, {
+        method: "PATCH",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(obj)
+      }).then(res => res.json())
+    }
 
-    const addNewPersonButton = document.getElementById('addNewPersonButton')
-    console.log(addNewPersonButton);
+    function deleteGift(id) {
+      fetch(baseGiftURL + `/${id}`, {
+        method: "DELETE"
+      }).then(res => res.json())
+    }
 
-
-    const forms = document.getElementById('forms')
+    // Create Gift
+    giftForm.addEventListener('submit', function(e) {
+      e.preventDefault()
+        let card = document.getElementsByClassName('card')[0].dataset.id
+        const giftImgInput = document.getElementById('giftImgInput').value
+        const giftNameInput = document.getElementById('giftNameInput').value
+        const giftDescriptionInput = document.getElementById('giftDescriptionInput').value
+        newGiftObj = {name: `${giftNameInput}`, gift_img: `${giftImgInput}`, description: `${giftDescriptionInput}`, person_id: `${card}`}
+        createGift(newGiftObj)
+    })
 
     function personFormAppend(){
       return `<div id="newPersonForm" class="ui container">
@@ -156,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     addNewPersonButton.addEventListener('click', function(e){
       peopleDiv.innerHTML = ""
-      forms.innerHTML += personFormAppend()
+      personForm.innerHTML += personFormAppend()
     })
 
     function appendGiftForm() {
@@ -184,11 +198,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
       giftForm.innerHTML += gF
     }
 
-
-    // giftsDiv.addEventListener('click', )
-
     function appendEditGiftForm(){
-      return `<div id="editGiftForm" class="ui container">
+      const gF = `<div id="editGiftForm" class="ui container">
         <div class="ui two column doubling stackable grid container">
           <img class="ui medium rounded image" src="http://via.placeholder.com/200x200">
           <form class="ui form">
@@ -206,12 +217,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
               <input id="giftDescriptionInput" type="text" name="birth_day" placeholder="Description">
             </div>
             <button class="ui button" type="submit">Save</button>
-            <button class="ui button" type="submit">Delete</button>
+            <input class="ui button" type="button" value="Delete">
           </form>
         </div>
       </div>`
+      giftForm.innerHTML += gF
     }
-
 
     // addNewPersonButton.addEventListener('click', function(e) {
     //   var x = addNewPersonButton
@@ -221,20 +232,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     //         x.style.visibility = "hidden";
     //     }
     // })
-
-    people.addEventListener('click', function(e){
-      if(e.target.id){
-        people.innerHTML = ""
-
-        //display person and all of their gifts
-
-      }
-    })
-
-    const newPersonForm = document.getElementById('newPersonForm')
-    forms.addEventListener('submit', handleNewPerson)
-
-    const pForm = document.getElementById('personForm')
 
     function handleNewPerson(e){
       e.preventDefault()
@@ -246,7 +243,37 @@ document.addEventListener("DOMContentLoaded", function(event) {
       let birth_day = bDayInput.value
       let newPerson = createPerson(name, img, birth_day)
       forms.innerHTML = ""
-      // getPeople()
     }
+    personForm.addEventListener('submit', handleNewPerson)
+
+    peopleDiv.addEventListener('click', function(e) {
+      peopleDiv.innerHTML = ''
+      appendGiftForm()
+      let pInfo = e.target.parentNode.parentNode.dataset.id
+      personStore.find(person => {
+        if(pInfo == person.id){
+          profileDiv.innerHTML += person.renderSingle()
+          person.gifts.forEach(gift => {
+            giftsDiv.innerHTML += gift.renderSingleGift()
+          })
+        }
+      })
+    })
+
+    giftsDiv.addEventListener('click', e => {
+      let gInfo = e.target.parentNode.parentNode.dataset.id
+      profileDiv.innerHTML = ''
+      giftForm.innerHTML = ''
+      appendEditGiftForm()
+      giftForm.addEventListener('submit', e => {
+        e.preventDefault()
+        const giftId = gInfo
+        const giftImgInput = document.getElementById('giftImgInput').value
+        const giftNameInput = document.getElementById('giftNameInput').value
+        const giftDescriptionInput = document.getElementById('giftDescriptionInput').value
+        editGiftObj = {id: `${giftId}` ,name: `${giftNameInput}`, gift_img: `${giftImgInput}`, description: `${giftDescriptionInput}`}
+        editGift(editGiftObj)
+      })
+    })
 
   });

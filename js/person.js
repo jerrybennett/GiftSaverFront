@@ -1,3 +1,4 @@
+let personStore = []
 class Person {
   constructor({id, name, img, birth_day}) {
     this.id = id,
@@ -5,6 +6,7 @@ class Person {
     this.img = img,
     this.birth_day = birth_day
     this.gifts = []
+    personStore.push(this)
   }
 
   addGift(gift) {
@@ -12,7 +14,7 @@ class Person {
   }
 
   render(){
-    return `<div data-set="${this.id}" class="card">
+    return `<div data-id="${this.id}" class="card">
       <div class="image">
         <img src="${this.img}">
       </div>
