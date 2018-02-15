@@ -20,6 +20,8 @@ class Gift {
           <a>${this.description}</a>
         </div>
       </div>
+      <button class="ui button editItem" type="button">Edit</button>
+      <button class="ui button deleteItem" type="button">Delete</button>
     </div>`
   }
 
@@ -43,7 +45,7 @@ class Gift {
           </div>
           <button class="ui button" type="submit">Save</button>
         </form>
-        <button class="ui button" type="submit">Delete</button>
+        <button class="ui button deleteItem" type="button">Delete</button>
       </div>
     </div>`
   }

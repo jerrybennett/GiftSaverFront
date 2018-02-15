@@ -1,15 +1,6 @@
 document.addEventListener("DOMContentLoaded", function(event) {
     console.log("DOM fully loaded and parsed");
 
-    function myFunction() {
-      var x = document.getElementById("newPersonForm");
-      if (x.style.display === "none") {
-          x.style.display = "block";
-      } else {
-          x.style.display = "none";
-      }
-    }
-
     const basePeopleURL = `http://localhost:3000/api/v1/people`
     const baseGiftURL = `http://localhost:3000/api/v1/gifts`
     const peopleDiv = document.getElementById('people')
@@ -217,7 +208,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
               <input id="giftDescriptionInput" type="text" name="birth_day" placeholder="Description">
             </div>
             <button class="ui button" type="submit">Save</button>
-            <input class="ui button" type="button" value="Delete">
           </form>
         </div>
       </div>`
@@ -261,19 +251,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
     })
 
     giftsDiv.addEventListener('click', e => {
-      let gInfo = e.target.parentNode.parentNode.dataset.id
-      profileDiv.innerHTML = ''
-      giftForm.innerHTML = ''
-      appendEditGiftForm()
-      giftForm.addEventListener('submit', e => {
-        e.preventDefault()
-        const giftId = gInfo
-        const giftImgInput = document.getElementById('giftImgInput').value
-        const giftNameInput = document.getElementById('giftNameInput').value
-        const giftDescriptionInput = document.getElementById('giftDescriptionInput').value
-        editGiftObj = {id: `${giftId}` ,name: `${giftNameInput}`, gift_img: `${giftImgInput}`, description: `${giftDescriptionInput}`}
-        editGift(editGiftObj)
-      })
+      if(e.target.className === 'ui button editItem'){
+        let gInfo = e.target.parentNode.dataset.id
+        giftForm.innerHTML = ''
+        appendEditGiftForm()
+        giftForm.addEventListener('submit', e => {
+          e.preventDefault()
+          const giftId = gInfo
+          const giftImgInput = document.getElementById('giftImgInput').value
+          const giftNameInput = document.getElementById('giftNameInput').value
+          const giftDescriptionInput = document.getElementById('giftDescriptionInput').value
+          editGiftObj = {id: `${giftId}` ,name: `${giftNameInput}`, gift_img: `${giftImgInput}`, description: `${giftDescriptionInput}`}
+          editGift(editGiftObj)
+        })
+      }
     })
+
+    // giftsDiv.addEventListener('click', e => {
+    //   console.log(e.target.parentNode);
+    // })
 
   });
